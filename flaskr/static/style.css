@@ -25,35 +25,59 @@ hr {
     border-top: 1px solid lightgray;
 }
 
-nav {
+.newbutton {
+    background-color: #377ba8;
+    color: white;
+    margin: 20px 100px;
+    padding: 14px 25px;
+    font-weight:bold;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1em;
+}
+
+.topheader {
     background: lightgray;
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
 }
 
-nav h1 {
+.topheader h1,
+.navbar h1 {
     flex: auto;
     margin: 0;
 }
 
-nav h1 a {
+.topheader h1 a,
+.navbar h1 a {
     text-decoration: none;
     padding: 0.25rem 0.5rem;
 }
 
-nav ul {
+.topheader ul,
+.navbar ul {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-nav ul li a,
-nav ul li span,
+.topheader ul li a,
+.navbar ul li a,
+.topheader ul li span,
 header .action {
     display: block;
     padding: 0.5rem;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
 }
 
 .content {
