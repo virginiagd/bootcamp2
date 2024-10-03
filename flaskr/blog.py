@@ -10,6 +10,7 @@ bp = Blueprint('blog', __name__)
 
 #show all of the posts
 @bp.route('/')
+@login_required
 def index():
     db = get_db()
     posts = db.execute(
