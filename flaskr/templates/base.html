@@ -16,8 +16,8 @@
 {% if g.user %}
   <nav class="navbar">
     <ul>
-      <li>
-        <h1><a href="{{ url_for('index') }}">Posts</a></h1>
+      <li><h1><a href="{{ url_for('index') }}">Posts</a></h1></li>
+      <li><h1><a href="{{ url_for('survey.survey') }}">Surveys</a></h1></li>
     </ul>
 </nav>
 {% endif %}
