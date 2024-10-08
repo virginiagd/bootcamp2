@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{{ survey.title }}</h1>
+{% endblock %}
+
+{% block content %}
+  <p>{{ survey.body }}</p>
+  
+  {% if already_voted %}
+    <p>Ya has votado en esta encuesta. Gracias por tu participación.</p>
+  {% else %}
+      <form method="post" action="{{ url_for('survey.vote', id=survey.id) }}">
+          <button type="submit" name="option" value="first">
+            A favor ({{ survey.first }} votos)
+          </button>
+          <button type="submit" name="option" value="second">
+            En contra ({{ survey.second }} votos)
+          </button>
+      </form>
+  {% endif %}
+  
+  {% if g.user['id'] == 1 %}
+  <form method="post" action="{{ url_for('survey.delete_survey', id=survey.id) }}" style="margin-top: 20px;">
+      <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar esta encuesta?');">
+          Eliminar Encuesta
+      </button>
+  </form>
+  {% endif %}
+
+  <p><strong>Resultados actuales:</strong></p>
+  <ul>
+    <li>A favor: {{ survey.first }} votos</li>
+    <li>En contra: {{ survey.second }} votos</li>
+    <a href="{{ url_for('results.results', id=survey['id']) }}">View Results</a>
+  </ul>
+
+  <a href="{{ url_for('survey.survey') }}">Volver a la lista de encuestas</a>
+{% endblock %}

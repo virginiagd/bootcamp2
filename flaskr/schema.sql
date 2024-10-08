@@ -18,6 +18,16 @@ CREATE TABLE IF NOT EXISTS survey (
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   title TEXT NOT NULL,
   body TEXT NOT NULL,
-  first INTEGER NOT NULL,
-  second INTEGER NOT NULL
+  first INTEGER NOT NULL DEFAULT 0,
+  second INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS votes (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER NOT NULL,
+    survey_id INTEGER NOT NULL,
+    vote_option TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (survey_id) REFERENCES survey (id),
+    UNIQUE(user_id, survey_id)  
 );

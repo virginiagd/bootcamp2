@@ -1,5 +1,32 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}New Survey{% endblock %}</h1>
+  <h1>{% block title %}Nueva Encuesta{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h1>Crear Nueva Encuesta</h1>
+
+{% if g.user.id == 1 %}  {# Verifica que sea el administrador #}
+
+<form method="post">
+    <label for="title">Título:</label>
+    <input type="text" name="title" required>
+
+    <label for="body">Descripción:</label>
+    <textarea name="body"></textarea>
+
+    <label for="first_option">Primera Opción:</label>
+    <input type="text" name="first_option" required>
+
+    <label for="second_option">Segunda Opción:</label>
+    <input type="text" name="second_option" required>
+
+    <button type="submit">Crear Encuesta</button>
+</form>
+
+{% else %}
+    <p>No tienes permiso para crear encuestas.</p>
+{% endif %}
+
 {% endblock %}

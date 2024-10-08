@@ -39,5 +39,10 @@ def create_app(test_config=None):
 
     from . import survey
     app.register_blueprint(survey.bp)
+    app.add_url_rule('/', endpoint='survey')
+
+    from . import results
+    app.register_blueprint(results.bp)
+    app.add_url_rule('/', endpoint='results')
 
     return app
