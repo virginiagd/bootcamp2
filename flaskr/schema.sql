@@ -29,5 +29,5 @@ CREATE TABLE IF NOT EXISTS votes (
     vote_option TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (survey_id) REFERENCES survey (id),
-    UNIQUE(user_id, survey_id)  
+    UNIQUE(user_id, survey_id)
 );

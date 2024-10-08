@@ -13,7 +13,7 @@ bp = Blueprint('survey', __name__, url_prefix='/surveys')
 @login_required
 def survey():
     db = get_db()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
     cursor.execute(
         'SELECT id, title, body, created, first, second'
         ' FROM survey'
@@ -98,10 +98,11 @@ def vote(id):
     db = get_db()
     cursor = db.cursor()
     # Check if the user has already voted on this survey
-    vote = cursor.execute(
+    cursor.execute(
         'SELECT id FROM votes WHERE user_id = %s AND survey_id = %s',
         (g.user['id'], id)
-    ).fetchone()
+    )
+    vote = cursor.fetchone()
 
     if vote:
         flash('You have already voted in this survey.')  # Prevent voting again
@@ -135,15 +136,17 @@ def delete_survey(id):
         abort(403, "You do not have permission to delete surveys.")
 
     # Check if the survey exists
-    survey = cursor.execute(
+    cursor.execute(
         'SELECT id FROM survey WHERE id = %s',
         (id,)
-    ).fetchone()
+    )
+    survey = cursor.fetchone()
 
     if survey is None:
         abort(404, f"Survey id {id} does not exist.")
 
     # Delete the survey from the database
+    cursor.execute('DELETE FROM votes WHERE survey_id = %s', (id,))
     cursor.execute('DELETE FROM survey WHERE id = %s', (id,))
     cursor.close()
     db.commit()

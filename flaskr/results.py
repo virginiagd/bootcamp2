@@ -10,19 +10,23 @@ bp = Blueprint('results', __name__, url_prefix='/results')
 @login_required
 def results(id):
     db = get_db()
-    survey = db.execute(
-        'SELECT title, body FROM survey WHERE id = ?',
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(
+        'SELECT title, body FROM survey WHERE id = %s',
         (id,)
-    ).fetchone()
+    )
+    survey = cursor.fetchone()
 
     if survey is None:
         abort(404, f"Survey id {id} does not exist.")
 
     # Fetch the results
-    results = db.execute(
-        'SELECT vote_option, COUNT(*) as count FROM votes WHERE survey_id = ? GROUP BY vote_option',
+    cursor.execute(
+        'SELECT vote_option, COUNT(*) as count FROM votes WHERE survey_id = %s GROUP BY vote_option',
         (id,)
-    ).fetchall()
+    )
+    results = cursor.fetchall()
+    cursor.close()
 
     # Check if results is empty
     if not results:
