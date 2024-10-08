@@ -20,8 +20,14 @@ def survey():
         ' ORDER BY created DESC'
     )
     surveys = cursor.fetchall()
+
+    cursor.execute(
+        'SELECT user_id, survey_id'
+        ' FROM votes'
+    )
+    user_voted = cursor.fetchall()
     cursor.close()
-    return render_template('form/surveys.html', surveys=surveys)
+    return render_template('form/surveys.html', surveys=surveys, user_voted=user_voted)
 
 # Create a new survey (only accessible to admin user with id = 1)
 @bp.route('/create', methods=('GET', 'POST'))
