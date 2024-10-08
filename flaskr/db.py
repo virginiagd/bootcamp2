@@ -1,15 +1,18 @@
-import sqlite3
 
+import time
 import click
 from flask import current_app, g
+import mysql.connector
+from mysql.connector import Error
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
+        g.db = mysql.connector.connect(
+            host=current_app.config['DB_HOST'],
+            user=current_app.config['DB_USER'],
+            password=current_app.config['DB_PASSWORD'],
+            database=current_app.config['DB_NAME']
         )
-        g.db.row_factory = sqlite3.Row
 
     return g.db
 
@@ -22,10 +25,22 @@ def close_db(e=None):
 
 
 def init_db():
-    db = get_db()
+    while True:
+        try:
+            db = get_db()
+            if db.is_connected():
+                click.echo("MySQL database is ready!")
+                cursor = db.cursor()
+            
+                with current_app.open_resource('schema.sql') as f:
+                    cursor.execute(f.read().decode('utf8'))
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+                cursor.close()
+                break
+        except Error as e:
+            click.echo("Waiting for MySQL database to be ready...")
+            time.sleep(5)
+
 
 
 @click.command('init-db')

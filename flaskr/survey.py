@@ -13,9 +13,12 @@ bp = Blueprint('survey', __name__, url_prefix='/survey')
 @login_required
 def survey():
     db = get_db()
-    surveys = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT id, title, body, created, first, second'
         ' FROM survey'
         ' ORDER BY created DESC'
-    ).fetchall()
+    )
+    surveys = cursor.fetchall()
+    cursor.close()
     return render_template('form/survey.html', surveys=surveys)

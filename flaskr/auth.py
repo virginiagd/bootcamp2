@@ -6,6 +6,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import get_db
+from mysql.connector import IntegrityError
 
 #creates a Blueprint named 'auth'
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -25,12 +26,13 @@ def register():
 
         if error is None:
             try:
-                db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
-                )
+                cursor = db.cursor()
+                cursor.execute(
+                    "INSERT INTO user (username, password) VALUES (%s, %s)",
+                    (username, generate_password_hash(password)))
                 db.commit()
-            except db.IntegrityError:
+                cursor.close()
+            except IntegrityError:
                 error = f"User {username} is already registered."
             else:
                 return redirect(url_for("auth.login"))
@@ -48,9 +50,12 @@ def login():
         password = request.form['password']
         db = get_db()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            'SELECT * FROM user WHERE username = %s', (username,)
+        )
+        user = cursor.fetchone()
+        cursor.close()
 
         if user is None:
             error = 'Incorrect username.'
@@ -76,9 +81,13 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            'SELECT * FROM user WHERE id = %s', (user_id,)
+        )
+        g.user = cursor.fetchone()
+        cursor.close()
 
 #remove the user id from the session
 @bp.route('/logout')

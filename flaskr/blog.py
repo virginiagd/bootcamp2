@@ -10,14 +10,16 @@ bp = Blueprint('blog', __name__)
 
 #show all of the posts
 @bp.route('/')
-@login_required
 def index():
     db = get_db()
-    posts = db.execute(
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
-    ).fetchall()
+    )
+    posts = cursor.fetchall()
+    cursor.close()
     return render_template('blog/index.html', posts=posts)
 
 #The create view works the same as the auth register view. Either the form is displayed, or the posted data is validated and the post is added to the database 
@@ -39,12 +41,14 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            cursor = db.cursor(dictionary=True)
+            cursor.execute(
                 'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
+                ' VALUES (%s, %s, %s)',
                 (title, body, g.user['id'])
             )
             db.commit()
+            cursor.close()
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html')
@@ -52,12 +56,16 @@ def create():
 #Both the update and delete views will need to fetch a post by id and check if the author matches the logged in user. 
 # To avoid duplicating code, you can write a function to get the post and call it from each view.
 def get_post(id, check_author=True):
-    post = get_db().execute(
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
+        ' WHERE p.id = %s',
         (id,)
-    ).fetchone()
+    )
+    post = cursor.fetchone()
+    cursor.close()
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
@@ -84,12 +92,14 @@ def update(id):
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                'UPDATE post SET title = ?, body = ?'
-                ' WHERE id = ?',
+            cursor = db.cursor()
+            cursor.execute(
+                'UPDATE post SET title = %s, body = %s'
+                ' WHERE id = %s',
                 (title, body, id)
             )
             db.commit()
+            cursor.close()
             return redirect(url_for('blog.index'))
 
     return render_template('blog/update.html', post=post)
@@ -100,6 +110,8 @@ def update(id):
 def delete(id):
     get_post(id)
     db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM post WHERE id = %s', (id,))
     db.commit()
+    cursor.close()
     return redirect(url_for('blog.index'))

@@ -1,6 +1,22 @@
 services:
+
+  mysql-flask-app-container:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
   web:
     build: .
+    links:
+      - mysql-flask-app-container
     ports:
       - "5000:5000"
     volumes:
@@ -10,3 +26,8 @@ services:
       FLASK_ENV: development
       FLASK_DEBUG: 1
     command: ./entrypoint.sh  # Llama al script de entrada
+    depends_on:
+      - mysql-flask-app-container
+
+volumes: 
+  mysql-data:
