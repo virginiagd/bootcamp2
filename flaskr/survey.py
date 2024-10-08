@@ -15,7 +15,7 @@ def survey():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute(
-        'SELECT id, title, body, created, first, second'
+        'SELECT id, title, body, created, optionOne, optionTwo, first, second'
         ' FROM survey'
         ' ORDER BY created DESC'
     )
@@ -34,14 +34,14 @@ def create():
     if request.method == 'POST':
         title = request.form.get('title')
         body = request.form.get('body')
-        first_option = request.form.get('first_option')
-        second_option = request.form.get('second_option')
+        optionOne = request.form.get('optionOne')
+        optionTwo = request.form.get('optionTwo')
         error = None
 
         # Validate that a title and both options are provided
         if not title:
             error = 'Title is required.'
-        elif not first_option or not second_option:
+        elif not optionOne or not optionTwo:
             error = 'Both options are required.'
 
         if error is not None:
@@ -51,9 +51,9 @@ def create():
             cursor = db.cursor()
             # Insert the new survey into the database, initializing votes for both options to 0
             cursor.execute(
-                'INSERT INTO survey (title, body, first, second)'
-                ' VALUES (%s, %s, %s, %s)',
-                (title, body, 0, 0)  
+                'INSERT INTO survey (title, body, optionOne, optionTwo, first, second)'
+                ' VALUES (%s, %s, %s, %s, %s, %s)',
+                (title, body, optionOne, optionTwo, 0, 0)  
             )
             db.commit()
             cursor.close()
@@ -68,7 +68,7 @@ def show_survey(id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute(
-        'SELECT id, title, body, first, second'
+        'SELECT id, title, body, optionOne, optionTwo, first, second'
         ' FROM survey WHERE id = %s',  # Get the survey by ID
         (id,)
     )

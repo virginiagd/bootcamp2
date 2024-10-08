@@ -12,10 +12,10 @@
   {% else %}
       <form method="post" action="{{ url_for('survey.vote', id=survey.id) }}">
           <button type="submit" name="option" value="first">
-            A favor ({{ survey.first }} votos)
+            {{ survey.optionOne }} ({{ survey.first }} votos)
           </button>
           <button type="submit" name="option" value="second">
-            En contra ({{ survey.second }} votos)
+            {{ survey.optionTwo }} ({{ survey.second }} votos)
           </button>
       </form>
   {% endif %}
@@ -27,13 +27,6 @@
       </button>
   </form>
   {% endif %}
-
-  <p><strong>Resultados actuales:</strong></p>
-  <ul>
-    <li>A favor: {{ survey.first }} votos</li>
-    <li>En contra: {{ survey.second }} votos</li>
-    <a href="{{ url_for('results.results', id=survey['id']) }}">View Results</a>
-  </ul>
 
   <a href="{{ url_for('survey.survey') }}">Volver a la lista de encuestas</a>
 {% endblock %}
