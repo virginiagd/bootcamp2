@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
+{% block header %}
+  <h1>{% block title %}Surveys{% endblock %}</h1>
+{% endblock %}
+
 {% block content %}
-  {% if g.user.id == 1 %} 
-  <a class="newbutton" href="{{ url_for('survey.create') }}">New survey</a>
-  {% endif %}
   {% for survey in surveys %}
     <article class="post">
       <header>
         <div>
-          <h1><a href="{{ url_for('survey.show_survey', id=survey['id']) }}">{{ survey['title'] }}</a></h1>
+          <h1>
+            <li><a href="{{ url_for('survey.show_survey', id=survey['id']) }}">{{ survey['title'] }}</a></li>
+          </h1>
           <div class="about">by {{ survey['username'] }} on {{ survey['created'].strftime('%Y-%m-%d') }}</div>
         </div>
       </header>
@@ -17,20 +20,8 @@
       {% if g.user['id'] == 1 %}
         <!-- Show delete button only if the user is an admin -->
         <form action="{{ url_for('survey.delete_survey', id=survey['id']) }}" method="post" style="display:inline;">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+
       {% endif %}
-      
-      {% for votes in user_voted %}
-      {% if survey.id == votes.survey_id and g.user['id'] == votes.user_id %}
-      <p><strong>Actual results:</strong></p>
-          <ul>
-            <li>{{ survey.optionOne }}: {{ survey.first }} votes</li>
-            <li>{{ survey.optionTwo }}: {{ survey.second }} votes</li>
-          </ul>
-        </form>
-      {% endif %}
-      {% endfor %}
       
     </article>
 
