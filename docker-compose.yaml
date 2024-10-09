@@ -1,7 +1,7 @@
 services:
 
   mysql-flask-app-container:
-    image: mysql:latest
+    image: mysql:9.0.1
     container_name: mysql_container
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -21,11 +21,6 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
-    environment:
-      FLASK_APP: __init__.py
-      FLASK_ENV: development
-      FLASK_DEBUG: 1
-    command: ./entrypoint.sh  # Llama al script de entrada
     depends_on:
       - mysql-flask-app-container
 
