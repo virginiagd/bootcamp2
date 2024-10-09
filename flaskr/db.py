@@ -3,7 +3,6 @@ import time
 import click
 from flask import current_app, g
 import mysql.connector
-from mysql.connector import Error
 
 def get_db():
     if 'db' not in g:
@@ -25,22 +24,13 @@ def close_db(e=None):
 
 
 def init_db():
-    while True:
-        try:
-            db = get_db()
-            if db.is_connected():
-                click.echo("MySQL database is ready!")
-                cursor = db.cursor()
+    db = get_db()
+    cursor = db.cursor()
             
-                with current_app.open_resource('schema.sql') as f:
-                    cursor.execute(f.read().decode('utf8'))
+    with current_app.open_resource('schema.sql') as f:
+        cursor.execute(f.read().decode('utf8'))
 
-                cursor.close()
-                break
-        except Error as e:
-            click.echo("Waiting for MySQL database to be ready...")
-            time.sleep(5)
-
+    cursor.close()
 
 
 @click.command('init-db')

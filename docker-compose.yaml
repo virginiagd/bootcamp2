@@ -12,6 +12,13 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root", "-proot", "-e", "USE surveyManagement;"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    labels:
+      - "autoheal=true"
 
   web:
     build: .
@@ -22,7 +29,9 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - mysql-flask-app-container
+      mysql-flask-app-container:
+        condition: service_healthy
+
     environment:
       FLASK_ENV: development
       FLASK_DEBUG: 1
